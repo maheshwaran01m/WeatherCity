@@ -66,7 +66,6 @@ extension WeatherView {
     
     return Text(temp)
       .font(.title2)
-    
   }
 }
 
@@ -86,7 +85,6 @@ extension WeatherView {
       Text("No Weather")
     }
   }
-
 }
 
 // MARK: - Fetch Weather
