@@ -11,7 +11,7 @@ import WeatherKit
 
 struct WeatherAttributionView: View {
   
-  // MARK: - Internal View
+  // MARK: - Internal Property
   
   @Environment(\.colorScheme) private var colorScheme
   private let weatherManager = WeatherManager.shared
