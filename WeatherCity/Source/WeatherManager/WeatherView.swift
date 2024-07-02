@@ -133,6 +133,7 @@ extension WeatherView {
       Image(systemName: "gear")
         .resizable()
         .font(.title)
+        .frame(width: 100, height: 100)
       
       Label("Location Services", systemImage: "gear")
       
