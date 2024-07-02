@@ -24,6 +24,9 @@ struct WeatherView: View {
   
   @State private var showCityList = false
   @State private var timeZone = TimeZone.current
+  
+  @State private var hourlyForecast: Forecast<HourWeather>?
+  
   // MARK: - View
   
   var body: some View {
@@ -62,9 +65,13 @@ extension WeatherView {
         }
       
       temperatureView(for: item)
+      temperatureValue
       
       Text(item.condition.description)
         .font(.title3)
+      
+      Divider()
+      hourlyWeatherView
     }
     .background(content: backgroundView)
     .safeAreaInset(edge: .bottom, content: bottomView)
@@ -95,6 +102,15 @@ extension WeatherView {
   }
   
   @ViewBuilder
+  private var temperatureValue: some View {
+    if let temperature = hourlyForecast?.map({ $0.temperature }),
+       let high = temperature.max(), let low = temperature.min() {
+      Text("H: \(high) L: \(low)")
+        .bold()
+    }
+  }
+  
+  @ViewBuilder
   private func bottomView() -> some View {
     VStack {
       WeatherAttributionView()
@@ -115,6 +131,52 @@ extension WeatherView {
       CityListView(locationManager.currentLocation,
                    locationManager: locationManager,
                    selectedCity: $selectedCity)
+    }
+  }
+  
+  // MARK: - Hourly Weather
+  
+  @ViewBuilder
+  var hourlyWeatherView: some View {
+    if let hourlyForecast {
+      Text("Hourly Forecast")
+        .font(.title)
+      Text("Next 25 hours")
+        .font(.caption)
+      
+      ScrollView(.horizontal) {
+        HStack(spacing: 4) {
+          ForEach(hourlyForecast, id: \.date) { hour in
+            VStack(spacing: 0) {
+              Text(hour.date.localeTime(for: timeZone))
+              
+              Divider()
+              Spacer()
+              
+              Image(systemName: hour.symbolName)
+                .renderingMode(.original)
+                .symbolVariant(.fill)
+                .font(.system(size: 22))
+                .padding(.bottom, 3)
+              
+              if hour.precipitationChance > 0 {
+                Text("\((hour.precipitationChance * 100).formatted(.number.precision(.fractionLength(0))))%")
+                  .foregroundStyle(Color.cyan)
+                  .bold()
+              }
+              Spacer()
+              
+              Text(weatherManager.temperatureFormatter.string(from: hour.temperature))
+            }
+          }
+        }
+        .font(.system(size: 13))
+        .frame(height: 100)
+      }
+      .scrollIndicators(.hidden)
+      .background(
+        RoundedRectangle(cornerRadius: 16).fill(Color.secondary.opacity(0.2))
+      )
     }
   }
 }
@@ -156,6 +218,8 @@ extension WeatherView {
       
       currentWeather = await weatherManager.currentWeather(for: selectedCity.weatherItem)
       timeZone = await locationManager.getTimeZone(for: selectedCity.weatherItem.coordinates)
+      
+      hourlyForecast = await weatherManager.hourlyForecast(for: selectedCity.weatherItem)
     }
     isLoading = false
   }
