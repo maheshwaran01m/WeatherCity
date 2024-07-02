@@ -47,6 +47,19 @@ extension WeatherManager {
   }
 }
 
+// MARK: - Daily Weather
+
+extension WeatherManager {
+  
+  func dailyForecast(for item: WeatherItem) async -> Forecast<DayWeather>? {
+    await Task.detached(priority: .userInitiated) {
+      
+      return try? await self.service.weather(for: item.coordinates, including: .daily)
+      
+    }.value
+  }
+}
+
 // MARK: - WeatherAttribution
 
 extension WeatherManager {

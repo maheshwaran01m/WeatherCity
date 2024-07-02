@@ -26,7 +26,10 @@ struct WeatherView: View {
   @State private var timeZone = TimeZone.current
   
   @State private var hourlyForecast: Forecast<HourWeather>?
+  @State private var dayilyForecast: Forecast<DayWeather>?
   
+  @State private var barWidth: Double = .zero
+
   // MARK: - View
   
   var body: some View {
@@ -40,7 +43,10 @@ struct WeatherView: View {
     if !locationManager.isAuthorized {
       locationDeniedView
     } else if let currentWeather, !isLoading {
-      weatherView(for: currentWeather)
+      ScrollView {
+        weatherView(for: currentWeather)
+      }
+      .scrollIndicators(.hidden)
     } else {
       placeholderView
     }
@@ -72,6 +78,9 @@ extension WeatherView {
       
       Divider()
       hourlyWeatherView
+      
+      Divider()
+      dailyWeatherView
     }
     .background(content: backgroundView)
     .safeAreaInset(edge: .bottom, content: bottomView)
@@ -179,6 +188,85 @@ extension WeatherView {
       )
     }
   }
+  
+  // MARK: - Daily Weather
+  
+  @ViewBuilder
+  var dailyWeatherView: some View {
+    if let dayilyForecast {
+      Text("Ten Day Forecast")
+        .font(.title)
+      
+      VStack {
+        let maxDayTemp = dayilyForecast.map { $0.highTemperature.value }.max() ?? 0
+        let minDayTemp = dayilyForecast.map { $0.lowTemperature.value }.min() ?? 0
+        let tempRange = maxDayTemp - minDayTemp
+        
+        ForEach(dayilyForecast, id: \.date) { day in
+          LabeledContent {
+            HStack(spacing: 0) {
+              VStack {
+                Image(systemName: day.symbolName)
+                  .renderingMode(.original)
+                  .symbolVariant(.fill)
+                  .font(.system(size: 20))
+                
+                if day.precipitationChance > 0 {
+                  Text("\((day.precipitationChance * 100).formatted(.number.precision(.fractionLength(0))))%")
+                    .font(.system(size: 10))
+                    .foregroundStyle(Color.cyan)
+                    .bold()
+                }
+              }
+              .frame(width: 25)
+              
+              Text(weatherManager.temperatureFormatter.string(from: day.lowTemperature))
+                .font(.system(size: 12, weight: .bold))
+                .frame(width: 50)
+                .foregroundColor(.white)
+              
+              RoundedRectangle(cornerRadius: 8)
+                .fill(Color.secondary.opacity(0.2))
+                .frame(height: 5)
+                .readSize { barWidth = $0.width }
+                .overlay {
+                  let degreeFactor = barWidth / tempRange
+                  let dayRangeWidth = (day.highTemperature.value - day.lowTemperature.value) * degreeFactor
+                  let xOffset = (day.lowTemperature.value - minDayTemp) * degreeFactor
+                  
+                  HStack {
+                    RoundedRectangle(cornerRadius: 10)
+                      .fill(
+                        LinearGradient(
+                          gradient: Gradient(colors: [.green, .orange]),
+                          startPoint: .leading, endPoint: .trailing
+                        ))
+                      .frame(width: dayRangeWidth, height: 5)
+                    
+                    Spacer()
+                  }
+                  .offset(x: xOffset)
+                }
+              
+              Text(weatherManager.temperatureFormatter.string(from: day.highTemperature))
+                .font(.system(size: 14, weight: .bold))
+                .frame(width: 50)
+                .foregroundColor(.white)
+            }
+          } label: {
+            Text(day.date.localeDate(for: timeZone))
+              .frame(width: 40, alignment: .leading)
+          }
+          .frame(height: 35)
+        }
+      }
+      .padding()
+      .background(
+        RoundedRectangle(cornerRadius: 16)
+          .fill(Color.secondary.opacity(0.2))
+      )
+    }
+  }
 }
 
 // MARK: - Placeholder
@@ -220,6 +308,7 @@ extension WeatherView {
       timeZone = await locationManager.getTimeZone(for: selectedCity.weatherItem.coordinates)
       
       hourlyForecast = await weatherManager.hourlyForecast(for: selectedCity.weatherItem)
+      dayilyForecast = await weatherManager.dailyForecast(for: selectedCity.weatherItem)
     }
     isLoading = false
   }
