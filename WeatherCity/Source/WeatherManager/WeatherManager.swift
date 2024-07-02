@@ -46,17 +46,3 @@ extension WeatherManager {
     }.value
   }
 }
-
-// MARK: - WeatherItem
-
-struct WeatherItem {
-  
-  let latitude: Double
-  let longitude: Double
-  
-  var coordinates: CLLocation {
-    .init(latitude: latitude, longitude: longitude)
-  }
-  
-  static let preview = Self.init(latitude: 37.3346, longitude: -122.0090)
-}
