@@ -34,6 +34,19 @@ extension WeatherManager {
   }
 }
 
+// MARK: - Hourly Weather
+
+extension WeatherManager {
+  
+  func hourlyForecast(for item: WeatherItem) async -> Forecast<HourWeather>? {
+    await Task.detached(priority: .userInitiated) {
+      
+      return try? await self.service.weather(for: item.coordinates, including: .hourly)
+      
+    }.value
+  }
+}
+
 // MARK: - WeatherAttribution
 
 extension WeatherManager {
