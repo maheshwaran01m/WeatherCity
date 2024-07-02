@@ -15,12 +15,15 @@ struct WeatherView: View {
   
   private let weatherManager = WeatherManager.shared
   
+  @Environment(\.scenePhase) private var scenePhase
   @State private var currentWeather: CurrentWeather?
   @State private var isLoading = false
   
   @StateObject private var locationManager = LocationManager()
   @State private var selectedCity: City?
-
+  
+  @State private var showCityList = false
+  @State private var timeZone = TimeZone.current
   // MARK: - View
   
   var body: some View {
@@ -47,6 +50,7 @@ extension WeatherView {
   
   private func weatherView(for item: CurrentWeather) -> some View {
     VStack {
+      dateView(for: item)
       Image(systemName: item.symbolName)
         .renderingMode(.original)
         .symbolVariant(.fill)
@@ -61,9 +65,11 @@ extension WeatherView {
       
       Text(item.condition.description)
         .font(.title3)
-      
-      WeatherAttributionView()
     }
+    .background(content: backgroundView)
+    .safeAreaInset(edge: .bottom, content: bottomView)
+    .preferredColorScheme(.dark)
+    .onChange(of: scenePhase, perform: updateCurrentCity)
   }
   
   @ViewBuilder
@@ -74,12 +80,41 @@ extension WeatherView {
     }
   }
   
+  @ViewBuilder
+  private func dateView(for item: CurrentWeather) -> some View {
+    Text(item.date.localeDate(for: timeZone))
+    Text(item.date.localeTime(for: timeZone))
+  }
+  
   private func temperatureView(for item: CurrentWeather) -> some View {
     let temp = weatherManager.temperatureFormatter.string(
       from: item.temperature)
     
     return Text(temp)
       .font(.title2)
+  }
+  
+  @ViewBuilder
+  private func bottomView() -> some View {
+    VStack {
+      WeatherAttributionView()
+        .tint(.white)
+      
+      Button {
+        showCityList.toggle()
+      } label: {
+        Image(systemName: "list.star")
+      }
+      .padding()
+      .background(Color(.darkGray), in: .circle)
+      .foregroundStyle(.white)
+      .padding(.horizontal)
+      .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+    .fullScreenCover(isPresented: $showCityList) {
+      CityListView(locationManager.currentLocation,
+                   selectedCity: $selectedCity)
+    }
   }
 }
 
@@ -119,8 +154,32 @@ extension WeatherView {
     Task.detached { @MainActor in
       
       currentWeather = await weatherManager.currentWeather(for: selectedCity.weatherItem)
+      timeZone = await locationManager.getTimeZone(for: selectedCity.weatherItem.coordinates)
     }
     isLoading = false
+  }
+  
+  private func updateCurrentCity(_ phase: ScenePhase) {
+    guard phase == .active else { return }
+    selectedCity = locationManager.currentLocation
+    Task {
+      await fetchWeather()
+    }
+  }
+}
+
+// MARK: - Background View
+
+extension WeatherView {
+  
+  @ViewBuilder
+  private func backgroundView() -> some View {
+    if selectedCity != nil,
+       let condition = currentWeather?.condition {
+      Image(condition.rawValue)
+        .blur(radius: 3.0)
+        .colorMultiply(.white.opacity(0.8))
+    }
   }
 }
 

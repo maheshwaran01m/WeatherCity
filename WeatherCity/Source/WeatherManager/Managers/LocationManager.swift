@@ -57,6 +57,12 @@ extension LocationManager: CLLocationManagerDelegate {
     return name ?? "No Data"
   }
   
+  func getTimeZone(for location: CLLocation) async -> TimeZone {
+    let timeZone = try? await CLGeocoder().reverseGeocodeLocation(location).first?.timeZone
+    
+    return timeZone ?? .current
+  }
+  
   func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
     switch manager.authorizationStatus {
     case .authorizedAlways, .authorizedWhenInUse:
