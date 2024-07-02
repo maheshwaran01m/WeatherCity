@@ -113,6 +113,7 @@ extension WeatherView {
     }
     .fullScreenCover(isPresented: $showCityList) {
       CityListView(locationManager.currentLocation,
+                   locationManager: locationManager,
                    selectedCity: $selectedCity)
     }
   }

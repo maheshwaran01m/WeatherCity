@@ -15,30 +15,38 @@ struct CityListView: View {
   
   @Binding var selectedCity: City?
   
+  @ObservedObject private var locationManager: LocationManager
+  
   init(_ currentLocation: City?,
+       locationManager: LocationManager,
        selectedCity: Binding<City?> = .constant(nil)) {
     self.currentLocation = currentLocation
+    self.locationManager = locationManager
     _selectedCity = selectedCity
   }
   
   var body: some View {
     NavigationStack {
       List {
-        if let currentLocation {
-          Text(currentLocation.name)
-            .onTapGesture {
-              selectedCity = currentLocation
-              dismiss()
-            }
+        Group {
+          if let currentLocation {
+            CityRowView(locationManager, city: currentLocation)
+              .onTapGesture {
+                selectedCity = currentLocation
+                dismiss()
+              }
+          }
+          
+          ForEach(City.cities) { city in
+            CityRowView(locationManager, city: city)
+              .onTapGesture {
+                selectedCity = city
+                dismiss()
+              }
+          }
         }
-        
-        ForEach(City.cities) { city in
-          Text(city.name)
-            .onTapGesture {
-              selectedCity = city
-              dismiss()
-            }
-        }
+        .clipShape(.rect(cornerRadius: 8))
+        .listRowInsets(.init(top: 0, leading: 20, bottom: 5, trailing: 20))
       }
       .listStyle(.plain)
       .navigationTitle("My City")
@@ -48,6 +56,9 @@ struct CityListView: View {
   }
 }
 
+// MARK: - Preview
+
 #Preview {
-  CityListView(.previewCity, selectedCity: .constant(.previewCity))
+  CityListView(.preview, locationManager: .init(),
+               selectedCity: .constant(.preview))
 }
