@@ -48,7 +48,7 @@ struct City: Identifiable, Hashable {
      .init(name: "Washington, DC", weatherItem: .init(latitude: 38.895438, longitude: -77.031281))]
   }
   
-  static var previewCity: City {
+  static var preview: City {
     .init(name: "North", weatherItem: .init(latitude: 49.320991, longitude: -123.074718))
   }
 }

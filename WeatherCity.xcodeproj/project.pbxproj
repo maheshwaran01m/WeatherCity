@@ -18,6 +18,7 @@
 		3DF010B42C31B1D400930202 /* WeatherAttributionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF010B32C31B1D400930202 /* WeatherAttributionView.swift */; };
 		3DF67E732C33FBBE0042E190 /* CityListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF67E722C33FBBE0042E190 /* CityListView.swift */; };
 		3DF67E762C33FE7B0042E190 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF67E752C33FE7B0042E190 /* Date+Extensions.swift */; };
+		3DF67E782C3413AA0042E190 /* CityRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF67E772C3413AA0042E190 /* CityRowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		3DF010B32C31B1D400930202 /* WeatherAttributionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAttributionView.swift; sourceTree = "<group>"; };
 		3DF67E722C33FBBE0042E190 /* CityListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityListView.swift; sourceTree = "<group>"; };
 		3DF67E752C33FE7B0042E190 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
+		3DF67E772C3413AA0042E190 /* CityRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityRowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,7 @@
 				3DF67E6F2C33F55E0042E190 /* Managers */,
 				3DF010B32C31B1D400930202 /* WeatherAttributionView.swift */,
 				3DF67E722C33FBBE0042E190 /* CityListView.swift */,
+				3DF67E772C3413AA0042E190 /* CityRowView.swift */,
 				3DF010B12C31AB8700930202 /* WeatherView.swift */,
 			);
 			path = WeatherManager;
@@ -208,6 +211,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DF67E782C3413AA0042E190 /* CityRowView.swift in Sources */,
 				3DF010B02C31A8E700930202 /* WeatherManager.swift in Sources */,
 				3D47A7712C31A14C005449A6 /* ContentView.swift in Sources */,
 				3DF67E762C33FE7B0042E190 /* Date+Extensions.swift in Sources */,
