@@ -44,10 +44,12 @@ extension LocationManager: CLLocationManagerDelegate {
     guard let userLocation else { return }
     Task {
       let name = await getLocationName(for: userLocation)
-      currentLocation = City(name: name, weatherItem: .init(
-        latitude: userLocation.coordinate.latitude,
-        longitude: userLocation.coordinate.longitude)
-      )
+      await MainActor.run { [weak self] in
+        self?.currentLocation = City(name: name, weatherItem: .init(
+          latitude: userLocation.coordinate.latitude,
+          longitude: userLocation.coordinate.longitude)
+        )
+      }
     }
   }
   

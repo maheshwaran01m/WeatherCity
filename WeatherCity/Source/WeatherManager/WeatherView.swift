@@ -114,7 +114,7 @@ extension WeatherView {
   private var temperatureValue: some View {
     if let temperature = hourlyForecast?.map({ $0.temperature }),
        let high = temperature.max(), let low = temperature.min() {
-      Text("H: \(high) L: \(low)")
+      Text("H: \(high.description) L: \(low.description)")
         .bold()
     }
   }
