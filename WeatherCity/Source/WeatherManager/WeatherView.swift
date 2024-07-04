@@ -47,6 +47,7 @@ struct WeatherView: View {
         weatherView(for: currentWeather)
       }
       .scrollIndicators(.hidden)
+      .safeAreaInset(edge: .bottom, content: bottomView)
     } else {
       placeholderView
     }
@@ -83,7 +84,6 @@ extension WeatherView {
       dailyWeatherView
     }
     .background(content: backgroundView)
-    .safeAreaInset(edge: .bottom, content: bottomView)
     .preferredColorScheme(.dark)
     .onChange(of: scenePhase, perform: updateCurrentCity)
   }
