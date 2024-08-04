@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
   
   var body: some View {
-    WeatherView()
+//    WeatherView()
+    WeatherContainerView(latitude: 37.3230, longitude: 122.0322)
   }
 }
 
